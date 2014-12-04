@@ -6,8 +6,7 @@ import scopt.OptionParser
 
 case class Config(debug:Boolean = false,
                   clusterSize: Int = -1,
-//                  arraySize: Int = 10,
-//                  valueRange:Int = 10000,
+                  agentsInNode: Int = 10,
                   nodes: Seq[String] = Seq())
 
 object Main {
@@ -21,12 +20,9 @@ object Main {
       opt[Int]('c', "cSize") action { (x, c) =>
         c.copy(clusterSize = x)
       } text "Initial Cluster Size"
-//      opt[Int]('a', "arraySize") action { (x, c) =>
-//        c.copy(arraySize = x)
-//      } text "Distributed Array Size"
-//      opt[Int]('r', "valueRange") optional() action { (x, c) =>
-//        c.copy(valueRange = x)
-//      } text "Values range"
+      opt[Int]('a', "agentsInNode") action { (x, c) =>
+        c.copy(agentsInNode = x)
+      } text "Agents in every node"
 
       help("help") text "prints this usage text"
 
@@ -46,13 +42,13 @@ object Main {
             else
               ConfigFactory.load()
           )
-//        val sys = ActorSystem("ClusterSystem", conf)
-//        sys.actorOf(Props[DistArrayNodeActor], "ablock")
-//
-//        if ((c.debug && port == "2551") || (!c.debug && c.arraySize != -1)) {
-//          val ep = sys.actorOf(Props[EntryPoint], "ep")
-//          ep ! SetDistArraySize(c)
-//        }
+        val sys = ActorSystem("ClusterSystem", conf)
+        sys.actorOf(Props[NodeRootActor], "ablock")
+
+        if ((c.debug && port == "2551") || (!c.debug && c.clusterSize != -1)) {//TODO Check e fix
+          val ep = sys.actorOf(Props[EntryPoint], "ep")
+          ep ! SetInitialSize(c)
+        }
       }
     } //getOrElse {}
 

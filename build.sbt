@@ -1,12 +1,12 @@
 name := """TesiBSPScala"""
 
-val akkaVersion = "2.3.6"
+val akkaVersion = "2.3.7"
 
 fork in run := true
 
 version := "0.1"
 
-scalaVersion := "2.11.2"
+scalaVersion := "2.11.4"
 
 resolvers += Resolver.sonatypeRepo("public")
 
@@ -27,8 +27,8 @@ javaOptions in run ++= Seq(
   "-XX:+UnlockCommercialFeatures",
   "-XX:+FlightRecorder")
 
-assemblyJarName in assembly := "SDAJClusterNode.jar"
+assemblyJarName in assembly := "BSPClusterNode.jar"
 
 test in assembly := {}
 
-mainClass in assembly := Some("it.unipd.trluca.arsort.Main")
+mainClass in assembly := Some("it.unipd.trluca.bsp.Main")
