@@ -1,6 +1,6 @@
 package it.unipd.trluca.bsp
 
-import akka.actor.{Props, ActorRef, ActorLogging, Actor}
+import akka.actor._
 import akka.cluster.Member
 import akka.pattern.ask
 import it.unipd.trluca.bsp.aggregators.{LocalPhaseClock, LocalAgentClock}

@@ -16,7 +16,7 @@ class PhaseClock extends Actor with Aggregator {
     case ep:ExecutePhase =>
       originalSender = sender()
       members foreach { m =>
-        context.system.actorSelection(m.address + ConstStr.NODE_ACT_NAME) ! ep
+        context.actorSelection(m.address + ConstStr.NODE_ACT_NAME) ! ep
       }
   }
 
