@@ -1,7 +1,6 @@
 package it.unipd.trluca.bsp.aggregators
 
 import akka.actor.{ActorLogging, Actor, ActorRef}
-import akka.cluster.Cluster
 import akka.contrib.pattern.Aggregator
 import it.unipd.trluca.bsp._
 

@@ -6,7 +6,7 @@ import it.unipd.trluca.bsp.{Active, Message, Done, ResReceived}
 
 import scala.collection.mutable.ArrayBuffer
 
-case class DispatchMessage(agents:ArrayBuffer[ActorSelection], m:Any)
+case class DispatchMessage(agents:ArrayBuffer[ActorSelection], phase:Int, m:Any)
 
 class MessageDispatcher extends Actor with Aggregator with ActorLogging {
 
@@ -15,11 +15,11 @@ class MessageDispatcher extends Actor with Aggregator with ActorLogging {
   var agentSize:Int = 0
 
   expectOnce {
-    case DispatchMessage(agents, m) =>
+    case DispatchMessage(agents, phase, m) =>
       originalSender = sender()
       agentSize = agents.size
       agents foreach { a =>
-        a ! Message(m)
+        a ! Message(phase, m)
       }
   }
 

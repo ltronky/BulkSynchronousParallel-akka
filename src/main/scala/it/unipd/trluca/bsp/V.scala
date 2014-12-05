@@ -18,6 +18,8 @@ class V(id:Int) extends Agent[Any, V] with ActorLogging {
 
   val edges = ArrayBuffer[ActorSelection]()
   var parent:Any = null
+  var assignedInPhase = -1
+  val refAS = context.actorSelection(Cluster(context.system).selfAddress + ConstStr.NODE_ACT_NAME + s"/ag$id")
 
   override def receive = super.receive orElse localReceive
   def localReceive: Receive = {
@@ -45,15 +47,15 @@ class V(id:Int) extends Agent[Any, V] with ActorLogging {
 
 
   override def run(m:List[Any], phase:Int): Future[Any] = {
-    if (parent == null) parent = m(0)
-    else if (phase > 0)
+    if (parent != null)
       return Future(Active(s = false))
 
-    //log.info("VRun Agent->" + id + " parent->" + parent + " phase=" + phase)
+    parent = m(0)
+    assignedInPhase = phase
     val mDispatcher = context.actorOf(Props[MessageDispatcher])
-    mDispatcher ? DispatchMessage(edges, m)
+    mDispatcher ? DispatchMessage(edges, phase+1, refAS)
   }
 
   override def toString = "V(" + id + " at " + Cluster(context.system).selfAddress +
-    ") [Parent " + parent + " withEdges " + edges + "]"
+    ") [Parent " + parent + " atP " + assignedInPhase + " withEdges " + edges + "]"
 }

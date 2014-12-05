@@ -19,7 +19,7 @@ abstract  class Agent[S:ClassTag, T <:Agent[S, T]] extends Actor {
   def receive = {
     case ExecutePhaseLocal(localAgents, phase) =>
       val orSender = sender()
-      val fInbox = (messageReceiver ? GetInbox).mapTo[Array[S]]
+      val fInbox = (messageReceiver ? GetInbox(phase)).mapTo[Array[S]]
       fInbox map { m =>
         if (m.isEmpty) {
           orSender ! PhaseTerminated(0)

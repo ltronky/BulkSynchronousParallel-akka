@@ -21,8 +21,6 @@ class NodeRootActor extends Actor with ActorLogging {
   def receive = {
     case InitNode(size) =>
       localAgents = Array.tabulate(size) {i => context.actorOf(V.props(i), s"ag$i")}
-
-      log.info("Contains {}", localAgents.mkString(","))
       sender() ! Done
 
     case CreateConnections(clusterMembers, nr) =>
@@ -48,6 +46,9 @@ class NodeRootActor extends Actor with ActorLogging {
       response map { Done =>
         orSender ! Done
       }
+
+    case TakeDownCluster =>
+      context.system.shutdown()
 
     case _=>
   }

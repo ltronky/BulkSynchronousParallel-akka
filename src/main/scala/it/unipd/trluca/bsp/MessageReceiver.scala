@@ -5,20 +5,21 @@ import akka.actor.{ActorLogging, Actor}
 import scala.collection.mutable.ArrayBuffer
 
 
-case object GetInbox
+case class GetInbox(phase:Int)
 case object ResReceived
-case class Message(x:Any)
+case class Message(phase:Int, x:Any)
 
 class MessageReceiver[S] extends Actor with ActorLogging {
-  var inc:ArrayBuffer[Any] = ArrayBuffer.empty[Any]
+  val inc = Array(ArrayBuffer.empty[Any], ArrayBuffer.empty[Any])
 
   def receive = {
-    case Message(x) => inc += x
+    case Message(phase, x) => inc(phase%2) += x
       sender() ! ResReceived
 
-    case GetInbox =>
-      sender() ! inc.toArray
-      inc.clear()
+    case GetInbox(phase) =>
+      sender() ! inc(phase%2).toArray
+      inc(phase%2).clear()
+
     case _=> log.info("Messaggio ignorato MessageReceiver")
   }
 

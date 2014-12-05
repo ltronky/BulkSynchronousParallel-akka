@@ -19,8 +19,8 @@ class LocalPhaseClock extends Actor with Aggregator {
   }
 
   val handle = expect {
-    case PhaseTerminated(agentsAlive) =>
-      results += PhaseTerminated(agentsAlive)
+    case pt:PhaseTerminated =>
+      results += pt
       if (results.size >= size) processResult()
   }
 

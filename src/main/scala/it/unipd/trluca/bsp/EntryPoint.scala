@@ -21,6 +21,8 @@ case class InitNode(size:Int) extends EngineStep
 case class CreateConnections(clusterSize:SortedSet[Member], nr:Int) extends EngineStep
 case object PrintResult extends EngineStep
 
+case object TakeDownCluster
+
 case object Done
 
 case object StartExecution
@@ -61,13 +63,13 @@ class EntryPoint extends Actor with ActorLogging {
 
     case InitStartAgents =>
       val act = context.actorSelection(Cluster(context.system).selfAddress + ConstStr.NODE_ACT_NAME + "/ag0/mr")
-      val response = act ? Message(act)
+      val response = act ? Message(0, act)
       response map { ResReceived =>
         self ! ExecutePhase(0)
       }
 
     case ExecutePhase(phase) =>
-      log.info(s"ExecutePhase($phase)")
+      log.info(s"ExecutingPhase($phase)")
       val wc = context.actorOf(Props[PhaseClock])
       val response = (wc ? ExecutePhase(phase)).mapTo[PhaseTerminated]
       response map { ps:PhaseTerminated =>
@@ -84,11 +86,14 @@ class EntryPoint extends Actor with ActorLogging {
       val response = wc ? PrintResult
       response map { Done =>
         log.info("PrintDone")
+        takeDown()
       }
+  }
 
-
-//      val engine = context.actorOf(Props[MRLiteEngine], "engine")
-//      engine ! StartJob(JobConstants(1, mmm, Cluster(context.system).state.members))
+  def takeDown() = {
+    Cluster(context.system).state.members foreach { m=>
+      context.actorSelection(m.address + ConstStr.NODE_ACT_NAME) ! TakeDownCluster
+    }
   }
 
   def shouldRunAgain(phase:Int) = true //TODO estrarre Engine e Job
