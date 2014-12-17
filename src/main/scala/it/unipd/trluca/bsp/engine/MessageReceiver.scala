@@ -1,6 +1,6 @@
-package it.unipd.trluca.bsp
+package it.unipd.trluca.bsp.engine
 
-import akka.actor.{ActorLogging, Actor}
+import akka.actor.{Actor, ActorLogging}
 
 import scala.collection.mutable.ArrayBuffer
 

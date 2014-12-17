@@ -45,7 +45,7 @@ object Main {
         val sys = ActorSystem("ClusterSystem", conf)
         sys.actorOf(Props[NodeRootActor], "ablock")
 
-        if ((c.debug && port == "2551") || (!c.debug && c.clusterSize != -1)) {//TODO Check e fix
+        if ((c.debug && port == "2551") || (!c.debug && c.clusterSize != -1)) {
           val ep = sys.actorOf(Props[EntryPoint], "ep")
           ep ! SetInitialSize(c)
         }

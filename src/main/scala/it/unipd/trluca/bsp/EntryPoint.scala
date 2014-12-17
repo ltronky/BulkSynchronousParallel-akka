@@ -4,7 +4,9 @@ import akka.actor._
 import akka.cluster.{Member, Cluster}
 import akka.pattern.ask
 import akka.util.Timeout
-import it.unipd.trluca.bsp.aggregators.{PhaseClock, WorldClock}
+import it.unipd.trluca.bsp.aggregators.WorldClock
+import it.unipd.trluca.bsp.engine.{InitStartAgents, JobTerminated, Message, Job}
+import it.unipd.trluca.bsp.engine.aggregators.PhaseClock
 
 import scala.collection.SortedSet
 import scala.concurrent.duration.DurationInt
@@ -27,20 +29,18 @@ case object Done
 
 case object StartExecution
 case object InitAgentsConnections
-case object InitStartAgents
-case class ExecutePhase(phase:Int)
 case class SetInitialSize(c:Config)
-case object JobTerminated
-case class PhaseTerminated(agentsAlive:Int)
 
-class EntryPoint extends Actor with ActorLogging {
+
+class EntryPoint extends Job[Any, V] with Actor with ActorLogging {
   def actorRefFactory = context
-  implicit val timeout = ConstStr.MAIN_TIMEOUT
 
   var agentsInNode = 0
   var clusterSize = 0
 
-  def receive = {
+  override def receive = super.receive orElse localReceive
+
+  def localReceive:Receive = {
     case SetInitialSize(config) =>
       agentsInNode = config.agentsInNode
       clusterSize = config.clusterSize
@@ -61,27 +61,8 @@ class EntryPoint extends Actor with ActorLogging {
         self ! InitStartAgents
       }
 
-    case InitStartAgents =>
-      val act = context.actorSelection(Cluster(context.system).selfAddress + ConstStr.NODE_ACT_NAME + "/ag0/mr")
-      val response = act ? Message(0, act)
-      response map { ResReceived =>
-        self ! ExecutePhase(0)
-      }
-
-    case ExecutePhase(phase) =>
-      log.info(s"ExecutingPhase($phase)")
-      val wc = context.actorOf(Props[PhaseClock])
-      val response = (wc ? ExecutePhase(phase)).mapTo[PhaseTerminated]
-      response map { ps:PhaseTerminated =>
-        if (shouldRunAgain(phase+1) && ps.agentsAlive > 0) {
-          self ! ExecutePhase(phase+1)
-        } else {
-          self ! JobTerminated
-        }
-      }
-
-
-    case JobTerminated => log.info("JobTerminated")
+    case JobTerminated =>
+      log.info("JobTerminated")
       val wc = context.actorOf(Props[WorldClock])
       val response = wc ? PrintResult
       response map { Done =>
@@ -96,5 +77,9 @@ class EntryPoint extends Actor with ActorLogging {
     }
   }
 
-  def shouldRunAgain(phase:Int) = true //TODO estrarre Engine e Job
+  override def shouldRunAgain(phase:Int) = true
+
+  override def startAgents():List[ActorSelection] = {
+    Array(context.actorSelection(Cluster(context.system).selfAddress + ConstStr.NODE_ACT_NAME + "/ag0/mr")).toList
+  }
 }

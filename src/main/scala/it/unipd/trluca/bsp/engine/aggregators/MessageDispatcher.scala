@@ -1,8 +1,8 @@
-package it.unipd.trluca.bsp.aggregators
+package it.unipd.trluca.bsp.engine.aggregators
 
-import akka.actor.{ActorLogging, ActorSelection, Actor, ActorRef}
+import akka.actor.{Actor, ActorLogging, ActorRef, ActorSelection}
 import akka.contrib.pattern.Aggregator
-import it.unipd.trluca.bsp.{Active, Message, Done, ResReceived}
+import it.unipd.trluca.bsp.engine.{Active, Message, ResReceived}
 
 import scala.collection.mutable.ArrayBuffer
 

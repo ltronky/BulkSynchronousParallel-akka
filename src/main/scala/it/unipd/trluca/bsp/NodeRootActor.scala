@@ -3,22 +3,21 @@ package it.unipd.trluca.bsp
 import akka.actor._
 import akka.cluster.Member
 import akka.pattern.ask
-import it.unipd.trluca.bsp.aggregators.{LocalPhaseClock, LocalAgentClock}
+import it.unipd.trluca.bsp.aggregators.LocalAgentClock
+import it.unipd.trluca.bsp.engine.{JobNode, PhaseTerminated, ExecutePhase}
+import it.unipd.trluca.bsp.engine.aggregators.{ExecutePhaseLocal, LocalPhaseClock}
 
 import scala.collection.SortedSet
 import scala.concurrent.ExecutionContext.Implicits.global
 
 case class CreateAgentConn(localAgents:Array[ActorRef], clusterMembers:SortedSet[Member], nr:Int)
-case class ExecutePhaseLocal(localAgents:Array[ActorRef], phase:Int)
 case class PrintResultLocal(localAgents:Array[ActorRef])
 
-class NodeRootActor extends Actor with ActorLogging {
-  implicit val timeout = ConstStr.MAIN_TIMEOUT
+class NodeRootActor extends JobNode with Actor with ActorLogging {
 
-  var localAgents:Array[ActorRef] = null
+  override def receive = super.receive orElse localReceive
 
-
-  def receive = {
+  def localReceive:Receive = {
     case InitNode(size) =>
       localAgents = Array.tabulate(size) {i => context.actorOf(V.props(i), s"ag$i")}
       sender() ! Done
@@ -31,14 +30,6 @@ class NodeRootActor extends Actor with ActorLogging {
         orSender ! Done
       }
 
-    case ExecutePhase(phase) => //TODO spostare su Engine Part
-      val orSender = sender()
-      val wc = context.actorOf(Props[LocalPhaseClock])
-      val response = (wc ? ExecutePhaseLocal(localAgents, phase)).mapTo[PhaseTerminated]
-      response map { pt:PhaseTerminated =>
-        orSender ! pt
-      }
-
     case PrintResult =>
       val orSender = sender()
       val wc = context.actorOf(Props[LocalAgentClock])
@@ -49,7 +40,5 @@ class NodeRootActor extends Actor with ActorLogging {
 
     case TakeDownCluster =>
       context.system.shutdown()
-
-    case _=>
   }
 }

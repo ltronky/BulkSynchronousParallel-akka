@@ -3,7 +3,8 @@ package it.unipd.trluca.bsp
 import akka.actor.{ActorLogging, ActorSelection, Props}
 import akka.cluster.Cluster
 import akka.pattern.ask
-import it.unipd.trluca.bsp.aggregators.{DispatchMessage, MessageDispatcher}
+import it.unipd.trluca.bsp.engine.aggregators.{DispatchMessage, MessageDispatcher}
+import it.unipd.trluca.bsp.engine.{Active, Agent}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future

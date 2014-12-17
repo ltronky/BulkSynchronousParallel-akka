@@ -10,13 +10,23 @@ scalaVersion := "2.11.4"
 
 resolvers += Resolver.sonatypeRepo("public")
 
-scalacOptions in Compile ++= Seq("-encoding", "UTF-8", "-target:jvm-1.7", "-deprecation", "-feature", "-unchecked", "-Xlog-reflective-calls", "-Xlint")
+scalacOptions in Compile ++= Seq(
+  "-encoding",
+  "UTF-8",
+  "-target:jvm-1.6",
+  "-deprecation",
+  "-feature",
+  "-unchecked",
+  "-Xlog-reflective-calls",
+  "-Xlint"
+)
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-cluster" % akkaVersion,
   "com.typesafe.akka" %% "akka-contrib" % akkaVersion,
-  "com.github.scopt" %% "scopt" % "3.2.0",
-  "org.fusesource" % "sigar" % "1.6.4")
+  "com.github.scopt"  %% "scopt"        % "3.2.0",
+  "org.fusesource"    %  "sigar"        % "1.6.4"
+)
 
 javaOptions in run ++= Seq(
   "-Djava.library.path=./sigar",

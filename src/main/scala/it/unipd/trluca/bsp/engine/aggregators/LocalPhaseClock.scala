@@ -1,10 +1,13 @@
-package it.unipd.trluca.bsp.aggregators
+package it.unipd.trluca.bsp.engine.aggregators
 
 import akka.actor.{Actor, ActorRef}
 import akka.contrib.pattern.Aggregator
 import it.unipd.trluca.bsp._
+import it.unipd.trluca.bsp.engine.PhaseTerminated
 
 import scala.collection.mutable.ArrayBuffer
+
+case class ExecutePhaseLocal(localAgents:Array[ActorRef], phase:Int)
 
 class LocalPhaseClock extends Actor with Aggregator {
   val results = ArrayBuffer.empty[PhaseTerminated]

@@ -1,11 +1,14 @@
-package it.unipd.trluca.bsp.aggregators
+package it.unipd.trluca.bsp.engine.aggregators
 
 import akka.actor.{Actor, ActorRef}
 import akka.cluster.Cluster
 import akka.contrib.pattern.Aggregator
 import it.unipd.trluca.bsp._
+import it.unipd.trluca.bsp.engine.{PhaseTerminated, ExecutePhase}
 
 import scala.collection.mutable.ArrayBuffer
+
+
 
 class PhaseClock extends Actor with Aggregator {
   val results = ArrayBuffer.empty[PhaseTerminated]

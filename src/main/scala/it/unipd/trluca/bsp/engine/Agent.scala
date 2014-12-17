@@ -1,16 +1,17 @@
-package it.unipd.trluca.bsp
+package it.unipd.trluca.bsp.engine
 
-import akka.actor.{Props, Actor}
+import akka.actor.{Actor, Props}
 import akka.pattern.ask
-import scala.reflect.ClassTag
+import it.unipd.trluca.bsp._
+import it.unipd.trluca.bsp.engine.aggregators.ExecutePhaseLocal
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.reflect.ClassTag
 
 case class Active(s:Boolean)
 
 abstract  class Agent[S:ClassTag, T <:Agent[S, T]] extends Actor {
-  case class Run(phase:Int)
 
   implicit val timeout = ConstStr.MAIN_TIMEOUT
 
