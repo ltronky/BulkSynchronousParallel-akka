@@ -36,11 +36,11 @@ class V(id:Int) extends Agent[Any, V] with ActorLogging {
           edges += as
         }
       }
-      log.info("CE " + toString)
+      //log.info("CE " + toString)
       sender() ! Done
 
     case PrintResult =>
-      log.info("CE " + toString)
+      //log.info("CE " + toString)
       sender() ! Done
 
     case _=>

@@ -5,8 +5,7 @@ import akka.cluster.{Member, Cluster}
 import akka.pattern.ask
 import akka.util.Timeout
 import it.unipd.trluca.bsp.aggregators.WorldClock
-import it.unipd.trluca.bsp.engine.{InitStartAgents, JobTerminated, Message, Job}
-import it.unipd.trluca.bsp.engine.aggregators.PhaseClock
+import it.unipd.trluca.bsp.engine.{InitStartAgents, JobTerminated, Job}
 
 import scala.collection.SortedSet
 import scala.concurrent.duration.DurationInt
@@ -24,12 +23,11 @@ case class CreateConnections(clusterSize:SortedSet[Member], nr:Int) extends Engi
 case object PrintResult extends EngineStep
 
 case object TakeDownCluster
-
 case object Done
 
+case class SetInitialSize(c:Config)
 case object StartExecution
 case object InitAgentsConnections
-case class SetInitialSize(c:Config)
 
 
 class EntryPoint extends Job[Any, V] with Actor with ActorLogging {
@@ -58,23 +56,23 @@ class EntryPoint extends Job[Any, V] with Actor with ActorLogging {
       val wc = context.actorOf(Props[WorldClock])
       val response = wc ? CreateConnections(Cluster(context.system).state.members, 3) //TODO numero massimo di connesioni DA un nodo
       response map { Done =>
+        log.info("StartEngine t=" + System.nanoTime())
         self ! InitStartAgents
       }
 
     case JobTerminated =>
-      log.info("JobTerminated")
+      log.info("JobTerminated t=" + System.nanoTime())
       val wc = context.actorOf(Props[WorldClock])
       val response = wc ? PrintResult
       response map { Done =>
         log.info("PrintDone")
-        takeDown()
+        self ! TakeDownCluster
       }
-  }
 
-  def takeDown() = {
-    Cluster(context.system).state.members foreach { m=>
-      context.actorSelection(m.address + ConstStr.NODE_ACT_NAME) ! TakeDownCluster
-    }
+    case TakeDownCluster =>
+      Cluster(context.system).state.members foreach { m=>
+        context.actorSelection(m.address + ConstStr.NODE_ACT_NAME) ! TakeDownCluster
+      }
   }
 
   override def shouldRunAgain(phase:Int) = true

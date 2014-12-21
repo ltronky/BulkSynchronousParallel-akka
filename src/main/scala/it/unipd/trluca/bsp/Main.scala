@@ -13,8 +13,8 @@ object Main {
   def main(args: Array[String]): Unit = {
 
     val parser = new OptionParser[Config]("scopt") {
-      head("Distributed-Array Sorting", "1.0")
-      opt[Unit]('d', "debug") optional() action { (x, c) =>
+      head("BSP Example", "1.0")
+      opt[Unit]('d', "debug") action { (x, c) =>
         c.copy(debug = true)
       } text "Debug"
       opt[Int]('c', "cSize") action { (x, c) =>

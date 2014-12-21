@@ -1,6 +1,6 @@
 name := """TesiBSPScala"""
 
-val akkaVersion = "2.3.7"
+val akkaVersion = "2.3.8"
 
 fork in run := true
 
@@ -37,7 +37,7 @@ javaOptions in run ++= Seq(
   "-XX:+UnlockCommercialFeatures",
   "-XX:+FlightRecorder")
 
-assemblyJarName in assembly := "BSPClusterNode.jar"
+assemblyJarName in assembly := "BSPScalaNode.jar"
 
 test in assembly := {}
 
