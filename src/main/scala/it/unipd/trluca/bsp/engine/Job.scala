@@ -29,8 +29,8 @@ trait Job[S, T <: Agent[S, T]] extends Actor with ActorLogging {
 
         case ExecutePhase(phase) =>
             log.info(s"ExecutingPhase($phase)")
-            val wc = context.actorOf(Props[PhaseClock])
-            val response = (wc ? ExecutePhase(phase)).mapTo[PhaseTerminated]
+            val pc = context.actorOf(Props[PhaseClock])
+            val response = (pc ? ExecutePhase(phase)).mapTo[PhaseTerminated]
             response map { ps: PhaseTerminated =>
                 if (shouldRunAgain(phase + 1) && ps.agentsAlive > 0) {
                     self ! ExecutePhase(phase + 1)

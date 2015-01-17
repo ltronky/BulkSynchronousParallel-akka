@@ -11,7 +11,7 @@ import scala.reflect.ClassTag
 
 case class Active(s:Boolean)
 
-abstract  class Agent[S:ClassTag, T <:Agent[S, T]] extends Actor {
+abstract class Agent[S:ClassTag, T <:Agent[S, T]] extends Actor {
 
   implicit val timeout = ConstStr.MAIN_TIMEOUT
 
