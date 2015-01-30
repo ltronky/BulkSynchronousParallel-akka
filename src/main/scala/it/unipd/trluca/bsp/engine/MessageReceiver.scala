@@ -19,8 +19,5 @@ class MessageReceiver[S] extends Actor with ActorLogging {
     case GetInbox(phase) =>
       sender() ! inc(phase%2).toArray
       inc(phase%2).clear()
-
-    case _=> log.info("Messaggio ignorato MessageReceiver")
   }
-
 }

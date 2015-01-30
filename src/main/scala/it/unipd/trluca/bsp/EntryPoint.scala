@@ -14,7 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object ConstStr {
   final val NODE_ACT_NAME = "/user/ablock"
-  final val MAIN_TIMEOUT = Timeout(10.seconds) //TODO controllare non sia troppo breve per l'esecuzione
+  final val MAIN_TIMEOUT = Timeout(10.seconds)
 }
 
 trait EngineStep

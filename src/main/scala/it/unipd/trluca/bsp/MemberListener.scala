@@ -41,7 +41,6 @@ class MemberListener extends Actor with ActorLogging {
     case LeaderChanged(address) =>
       log.info(s"leader changed: $address")
 
-    //case _: MemberEvent => // ignore
     case m:Any => log.info("MessageLost:" + m)// ignore
   }
 
